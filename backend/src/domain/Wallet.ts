@@ -1,44 +1,21 @@
 import Balance from "./Balance";
-import Document from "./Document";
-import Email from "./Email";
-import Name from "./Name";
 import Order from "./Order";
-import Password from "./Password";
 import UUID from "./UUID";
 
-// Account é uma entity porque tem identidade e realiza mutação
-// Account também um aggregate porque atua como Aggregate Root, liderando o grupo/cluster de objetos de domínio
-export default class Account {
+export default class Wallet {
     private accountId: UUID;
-    private name: Name;
-    private email: Email;
-    private document: Document;
-    private password: Password;
 
     constructor (
         accountId: string,
-        name: string,
-        email: string,
-        document: string,
-        password: string,
         readonly balances: Balance[]
     ) {
         this.accountId = new UUID(accountId);
-        this.name = new Name(name);
-        this.email = new Email(email);
-        this.document = new Document(document);
-        this.password = new Password(password);
     }
 
-    static createAccount (
-        name: string,
-        email: string,
-        document: string,
-        password: string
-    ) {
+    static createWallet () {
         const accountId = UUID.create().getValue();
         const balances: Balance[] = [];
-        return new Account(accountId, name, email, document, password, balances);
+        return new Wallet(accountId, balances);
     }
 
     deposit (assetId: string, quantity: number) {
@@ -72,27 +49,6 @@ export default class Account {
         if (balance.getAvailableQuantity() < quantity) return false;
         balance.blockedQuantity += quantity;
         return true;
-    }
-
-
-    getName () {
-        return this.name.getValue();
-    }
-
-    getEmail () {
-        return this.email.getValue();
-    }
-
-    setEmail (email: string) {
-        this.email = new Email(email);
-    }
-
-    getDocument () {
-        return this.document.getValue();
-    }
-
-    getPassword () {
-        return this.password.getValue();
     }
 
     getAccountId () {

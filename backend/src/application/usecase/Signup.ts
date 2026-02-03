@@ -10,9 +10,9 @@ export default class Signup {
     async execute (input: Input): Promise<Output> {
         const account = Account.createAccount(input.name, input.email, input.document, input.password);
         await this.accountRepository.saveAccount(account);
-        await sendEmail(account.email, "Welcome!", "...");
+        await sendEmail(account.getEmail(), "Welcome!", "...");
         return {
-            accountId: account.accountId
+            accountId: account.getAccountId()
         }
     }
 }

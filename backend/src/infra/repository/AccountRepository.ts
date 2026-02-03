@@ -15,13 +15,13 @@ export class AccountRepositoryDatabase implements AccountRepository {
     }
 
     async saveAccount (account: Account) {
-        await this.connection.query("insert into ccca.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)", [account.accountId, account.getName(), account.email, account.document, account.password]);
+        await this.connection.query("insert into ccca.account (account_id, name, email, document, password) values ($1, $2, $3, $4, $5)", [account.getAccountId(), account.getName(), account.getEmail(), account.getDocument(), account.getPassword()]);
     }
 
     async updateAccount (account: Account) {
-        await this.connection.query("delete from ccca.balance where account_id = $1", [account.accountId]);
+        await this.connection.query("delete from ccca.balance where account_id = $1", [account.getAccountId()]);
         for (const balance of account.balances) {
-            await this.connection.query("insert into ccca.balance (account_id, asset_id, quantity) values ($1, $2, $3)", [account.accountId, balance.assetId, balance.quantity]);
+            await this.connection.query("insert into ccca.balance (account_id, asset_id, quantity, blocked_quantity) values ($1, $2, $3, $4)", [account.getAccountId(), balance.assetId, balance.quantity, balance.blockedQuantity]);
         }
     }
 
@@ -29,7 +29,7 @@ export class AccountRepositoryDatabase implements AccountRepository {
         const [account] = await this.connection.query("select * from ccca.account where account_id = $1", [accountId]);
         if (!account) throw new Error("Account not found");
         const balancesData = await this.connection.query("select * from ccca.balance where account_id = $1", [accountId]);
-        const balances = balancesData.map((balanceData: any) => (new Balance(balanceData.asset_id, parseFloat(balanceData.quantity))));
+        const balances = balancesData.map((balanceData: any) => (new Balance(balanceData.asset_id, parseFloat(balanceData.quantity), parseFloat(balanceData.blocked_quantity))));
         return new Account(account.account_id, account.name, account.email, account.document, account.password, balances);
     }
 }
@@ -47,7 +47,7 @@ export class AccountRepositoryMemory implements AccountRepository {
     }
 
     async getAccountById(accountId: string): Promise<Account> {
-        const account = this.accounts.find((account: Account) => account.accountId === accountId);
+        const account = this.accounts.find((account: Account) => account.getAccountId() === accountId);
         if (!account) throw new Error("Account not found");
         return account;
     }
