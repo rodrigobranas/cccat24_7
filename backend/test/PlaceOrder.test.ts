@@ -7,6 +7,7 @@ import GetAccount from "../src/application/usecase/GetAccount";
 import GetOrder from "../src/application/usecase/GetOrder";
 import Signup from "../src/application/usecase/Signup";
 import PlaceOrder from "../src/application/usecase/PlaceOrder";
+import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -19,10 +20,11 @@ beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
     const accountRepository = new AccountRepositoryDatabase(databaseConnection);
     const orderRepository = new OrderRepositoryDatabase(databaseConnection);
+    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
     signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository);
-    deposit = new Deposit(accountRepository);
-    placeOrder = new PlaceOrder(accountRepository, orderRepository);
+    getAccount = new GetAccount(accountRepository, walletRepository);
+    deposit = new Deposit(accountRepository, walletRepository);
+    placeOrder = new PlaceOrder(orderRepository, walletRepository);
     getOrder = new GetOrder(orderRepository);
 });
 
@@ -110,6 +112,54 @@ test("Não deve criar mais uma ordem de compra em uma conta do que existe saldo"
         price: 78000
     }
     await expect(() => placeOrder.execute(inputOrder2)).rejects.toThrow(new Error("Insufficient funds"));
+});
+
+test.only("Deve criar uma ordem de compra e uma ordem de venda em uma conta", async () => {
+    const marketId = `BTC-USD-${Math.random()}`;
+    const input = {
+        name: "John Doe",
+        email: "john.doe@gmail.com",
+        document: "97456321558",
+        password: "asdQWE123"
+    }
+    const outputSignup = await signup.execute(input);
+    await deposit.execute({
+        accountId: outputSignup.accountId,
+        assetId: "BTC",
+        quantity: 2
+    });
+    await deposit.execute({
+        accountId: outputSignup.accountId,
+        assetId: "USD",
+        quantity: 200000
+    });
+    const outputPlaceOrder2 = await placeOrder.execute({
+        accountId: outputSignup.accountId,
+        marketId,
+        side: "sell",
+        quantity: 1,
+        price: 78000
+    });
+    const outputPlaceOrder3 = await placeOrder.execute({
+        accountId: outputSignup.accountId,
+        marketId,
+        side: "sell",
+        quantity: 1,
+        price: 78000
+    });
+    const outputPlaceOrder1 = await placeOrder.execute({
+        accountId: outputSignup.accountId,
+        marketId,
+        side: "buy",
+        quantity: 2,
+        price: 78000
+    });
+    const outputGetOrder1 = await getOrder.execute(outputPlaceOrder1.orderId);
+    console.log(outputGetOrder1);
+    const outputGetOrder2 = await getOrder.execute(outputPlaceOrder2.orderId);
+    console.log(outputGetOrder2);
+    const outputGetOrder3 = await getOrder.execute(outputPlaceOrder3.orderId);
+    console.log(outputGetOrder3);
 });
 
 afterEach(async () => {

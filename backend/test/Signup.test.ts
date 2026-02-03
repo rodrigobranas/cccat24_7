@@ -5,6 +5,7 @@ import Account from "../src/domain/Account";
 import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
 import * as mailer from "../src/infra/mailer/mailer";
+import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -13,8 +14,9 @@ let getAccount: GetAccount;
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
     const accountDAO = new AccountRepositoryDatabase(databaseConnection);
+    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
     signup = new Signup(accountDAO);
-    getAccount = new GetAccount(accountDAO);
+    getAccount = new GetAccount(accountDAO, walletRepository);
 });
 
 test("Deve criar uma conta", async () => {

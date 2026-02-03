@@ -107,5 +107,15 @@ export default class Order {
         const [, paymentAsset] = this.getMarketId().split("-");
         return paymentAsset;
     }
+
+    fill (quantity: number, price: number) {
+        this.fillQuantity += quantity;
+        this.fillPrice = price;
+        if (this.getAvailableQuantity() === 0) this.status = "closed";
+    }
     
+    getAvailableQuantity () {
+        return this.quantity - this.fillQuantity;
+    }
+
 }

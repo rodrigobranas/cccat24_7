@@ -1,13 +1,9 @@
-import Balance from "./Balance";
 import Document from "./Document";
 import Email from "./Email";
 import Name from "./Name";
-import Order from "./Order";
 import Password from "./Password";
 import UUID from "./UUID";
 
-// Account é uma entity porque tem identidade e realiza mutação
-// Account também um aggregate porque atua como Aggregate Root, liderando o grupo/cluster de objetos de domínio
 export default class Account {
     private accountId: UUID;
     private name: Name;
@@ -20,8 +16,7 @@ export default class Account {
         name: string,
         email: string,
         document: string,
-        password: string,
-        readonly balances: Balance[]
+        password: string
     ) {
         this.accountId = new UUID(accountId);
         this.name = new Name(name);
@@ -37,43 +32,8 @@ export default class Account {
         password: string
     ) {
         const accountId = UUID.create().getValue();
-        const balances: Balance[] = [];
-        return new Account(accountId, name, email, document, password, balances);
+        return new Account(accountId, name, email, document, password);
     }
-
-    deposit (assetId: string, quantity: number) {
-        const existingBalance = this.balances.find((balance: Balance) => balance.assetId === assetId);
-        if (existingBalance) {
-            existingBalance.quantity += quantity;
-        } else {
-            this.balances.push(new Balance(assetId, quantity, 0));
-        }
-    }
-
-    withdraw (assetId: string, quantity: number) {
-        const existingBalance = this.balances.find((balance: Balance) => balance.assetId === assetId);
-        if (!existingBalance) throw new Error("Insufficient funds");
-        const newQuantity = existingBalance.quantity - quantity
-        if (newQuantity < 0) throw new Error("Insufficient funds");
-        existingBalance.quantity = newQuantity;
-    }
-
-    getBalance (assetId: string) {
-        const existingBalance = this.balances.find((balance: Balance) => balance.assetId === assetId);
-        if (!existingBalance) return 0;
-        return existingBalance.getAvailableQuantity();
-    }
-
-    blockOrder (order: Order) {
-        const assetId = (order.getSide() === "buy") ? order.getPaymentAsset() : order.getMainAsset();
-        const quantity = (order.getSide() === "buy") ? order.getPrice() * order.getQuantity() : order.getQuantity();
-        const balance = this.balances.find((balance: Balance) => balance.assetId === assetId);
-        if (!balance) return false;
-        if (balance.getAvailableQuantity() < quantity) return false;
-        balance.blockedQuantity += quantity;
-        return true;
-    }
-
 
     getName () {
         return this.name.getValue();

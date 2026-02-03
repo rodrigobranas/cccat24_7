@@ -4,6 +4,7 @@ import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/Data
 import Deposit from "../src/application/usecase/Deposit";
 import GetAccount from "../src/application/usecase/GetAccount";
 import Signup from "../src/application/usecase/Signup";
+import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -13,9 +14,10 @@ let deposit: Deposit;
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
     const accountRepository = new AccountRepositoryDatabase(databaseConnection);
+    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
     signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository);
-    deposit = new Deposit(accountRepository);
+    getAccount = new GetAccount(accountRepository, walletRepository);
+    deposit = new Deposit(accountRepository, walletRepository);
 });
 
 test("Deve depositar em uma conta", async () => {
