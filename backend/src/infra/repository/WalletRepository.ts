@@ -1,6 +1,7 @@
 import Wallet from "../../domain/Wallet";
 import Balance from "../../domain/Balance";
 import DatabaseConnection from "../database/DatabaseConnection";
+import { inject } from "../di/Registry";
 
 
 export default interface WalletRepository {
@@ -9,9 +10,8 @@ export default interface WalletRepository {
 }
 
 export class WalletRepositoryDatabase implements WalletRepository {
-
-    constructor (readonly connection: DatabaseConnection) {
-    }
+    @inject("databaseConnection")
+    connection!: DatabaseConnection;
 
     async updateWallet (wallet: Wallet) {
         await this.connection.query("delete from ccca.balance where account_id = $1", [wallet.getAccountId()]);

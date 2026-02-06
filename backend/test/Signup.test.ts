@@ -3,9 +3,11 @@ import GetAccount from "../src/application/usecase/GetAccount";
 import Signup from "../src/application/usecase/Signup";
 import Account from "../src/domain/Account";
 import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import Registry from "../src/infra/di/Registry";
+import { AccountRepositoryDatabase, AccountRepositoryORM } from "../src/infra/repository/AccountRepository";
 import * as mailer from "../src/infra/mailer/mailer";
 import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
+import ORM from "../src/infra/orm/ORM";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -13,10 +15,12 @@ let getAccount: GetAccount;
 
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
-    const accountDAO = new AccountRepositoryDatabase(databaseConnection);
-    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
-    signup = new Signup(accountDAO);
-    getAccount = new GetAccount(accountDAO, walletRepository);
+    Registry.getInstance().register("databaseConnection", databaseConnection);
+    Registry.getInstance().register("orm", new ORM());
+    Registry.getInstance().register("accountRepository", new AccountRepositoryORM());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
 });
 
 test("Deve criar uma conta", async () => {

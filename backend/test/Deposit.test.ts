@@ -5,6 +5,7 @@ import Deposit from "../src/application/usecase/Deposit";
 import GetAccount from "../src/application/usecase/GetAccount";
 import Signup from "../src/application/usecase/Signup";
 import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
+import Registry from "../src/infra/di/Registry";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -13,11 +14,12 @@ let deposit: Deposit;
 
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
-    const accountRepository = new AccountRepositoryDatabase(databaseConnection);
-    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository, walletRepository);
-    deposit = new Deposit(accountRepository, walletRepository);
+    Registry.getInstance().register("databaseConnection", databaseConnection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
+    deposit = new Deposit();
 });
 
 test("Deve depositar em uma conta", async () => {

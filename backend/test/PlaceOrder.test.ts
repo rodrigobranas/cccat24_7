@@ -8,6 +8,7 @@ import GetOrder from "../src/application/usecase/GetOrder";
 import Signup from "../src/application/usecase/Signup";
 import PlaceOrder from "../src/application/usecase/PlaceOrder";
 import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
+import Registry from "../src/infra/di/Registry";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;
@@ -18,14 +19,15 @@ let getOrder: GetOrder;
 
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
-    const accountRepository = new AccountRepositoryDatabase(databaseConnection);
-    const orderRepository = new OrderRepositoryDatabase(databaseConnection);
-    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository, walletRepository);
-    deposit = new Deposit(accountRepository, walletRepository);
-    placeOrder = new PlaceOrder(orderRepository, walletRepository);
-    getOrder = new GetOrder(orderRepository);
+    Registry.getInstance().register("databaseConnection", databaseConnection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
+    Registry.getInstance().register("orderRepository", new OrderRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
+    deposit = new Deposit();
+    placeOrder = new PlaceOrder();
+    getOrder = new GetOrder();
 });
 
 test("Deve criar uma ordem de compra em uma conta", async () => {
@@ -114,7 +116,7 @@ test("Não deve criar mais uma ordem de compra em uma conta do que existe saldo"
     await expect(() => placeOrder.execute(inputOrder2)).rejects.toThrow(new Error("Insufficient funds"));
 });
 
-test.only("Deve criar uma ordem de compra e uma ordem de venda em uma conta", async () => {
+test("Deve criar uma ordem de compra e uma ordem de venda em uma conta", async () => {
     const marketId = `BTC-USD-${Math.random()}`;
     const input = {
         name: "John Doe",

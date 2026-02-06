@@ -3,6 +3,7 @@ import GetAccount from "../src/application/usecase/GetAccount";
 import Signup from "../src/application/usecase/Signup";
 import Withdraw from "../src/application/usecase/Withdraw";
 import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
+import Registry from "../src/infra/di/Registry";
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
 import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
 
@@ -14,12 +15,13 @@ let withdraw: Withdraw;
 
 beforeEach(() => {
     databaseConnection = new PgPromiseAdapter();
-    const accountRepository = new AccountRepositoryDatabase(databaseConnection);
-    const walletRepository = new WalletRepositoryDatabase(databaseConnection);
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository, walletRepository);
-    deposit = new Deposit(accountRepository, walletRepository);
-    withdraw = new Withdraw(accountRepository, walletRepository);
+    Registry.getInstance().register("databaseConnection", databaseConnection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
+    deposit = new Deposit();
+    withdraw = new Withdraw();
 });
 
 test("Deve sacar de uma conta", async () => {
