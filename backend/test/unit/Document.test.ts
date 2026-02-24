@@ -1,4 +1,4 @@
-import Document from "../src/domain/Document";
+import Document from "../../src/domain/Document";
 
 test.each([
     "97456321558",

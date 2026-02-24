@@ -1,6 +1,6 @@
-import Account from "../src/domain/Account";
-import Order from "../src/domain/Order";
-import Wallet from "../src/domain/Wallet";
+import Account from "../../src/domain/Account";
+import Order from "../../src/domain/Order";
+import Wallet from "../../src/domain/Wallet";
 
 test("Deve fazer um depósito", () => {
     const wallet = Wallet.createWallet();

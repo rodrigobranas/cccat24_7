@@ -1,13 +1,13 @@
+import GetAccount from "../../src/application/usecase/GetAccount";
+import Signup from "../../src/application/usecase/Signup";
+import Account from "../../src/domain/Account";
+import DatabaseConnection, { PgPromiseAdapter } from "../../src/infra/database/DatabaseConnection";
+import Registry from "../../src/infra/di/Registry";
+import ORM from "../../src/infra/orm/ORM";
+import { AccountRepositoryORM, AccountRepositoryDatabase } from "../../src/infra/repository/AccountRepository";
+import { WalletRepositoryDatabase } from "../../src/infra/repository/WalletRepository";
 import sinon from "sinon";
-import GetAccount from "../src/application/usecase/GetAccount";
-import Signup from "../src/application/usecase/Signup";
-import Account from "../src/domain/Account";
-import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
-import Registry from "../src/infra/di/Registry";
-import { AccountRepositoryDatabase, AccountRepositoryORM } from "../src/infra/repository/AccountRepository";
-import * as mailer from "../src/infra/mailer/mailer";
-import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
-import ORM from "../src/infra/orm/ORM";
+import * as mailer from "../../src/infra/mailer/mailer";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;

@@ -7,7 +7,6 @@ export default class Signup {
     @inject("accountRepository")
     accountRepository!: AccountRepository;
 
-
     async execute (input: Input): Promise<Output> {
         const account = Account.createAccount(input.name, input.email, input.document, input.password);
         await this.accountRepository.saveAccount(account);

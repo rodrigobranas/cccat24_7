@@ -1,11 +1,11 @@
-import Deposit from "../src/application/usecase/Deposit";
-import GetAccount from "../src/application/usecase/GetAccount";
-import Signup from "../src/application/usecase/Signup";
-import Withdraw from "../src/application/usecase/Withdraw";
-import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
-import Registry from "../src/infra/di/Registry";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
-import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
+import Deposit from "../../src/application/usecase/Deposit";
+import GetAccount from "../../src/application/usecase/GetAccount";
+import Signup from "../../src/application/usecase/Signup";
+import Withdraw from "../../src/application/usecase/Withdraw";
+import DatabaseConnection, { PgPromiseAdapter } from "../../src/infra/database/DatabaseConnection";
+import Registry from "../../src/infra/di/Registry";
+import { AccountRepositoryDatabase } from "../../src/infra/repository/AccountRepository";
+import { WalletRepositoryDatabase } from "../../src/infra/repository/WalletRepository";
 
 let databaseConnection: DatabaseConnection;
 let signup: Signup;

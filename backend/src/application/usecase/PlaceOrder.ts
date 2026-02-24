@@ -1,5 +1,7 @@
 import Order from "../../domain/Order";
+import OrderPlacedEvent from "../../domain/OrderPlacedEvent";
 import { inject } from "../../infra/di/Registry";
+import Mediator from "../../infra/mediator/Mediator";
 import OrderRepository from "../../infra/repository/OrderRepository";
 import WalletRepository from "../../infra/repository/WalletRepository";
 
@@ -8,6 +10,8 @@ export default class PlaceOrder {
     orderRepository!: OrderRepository;
     @inject("walletRepository")
     walletRepository!: WalletRepository;
+    @inject("mediator")
+    mediator!: Mediator;
 
     async execute (input: Input): Promise<Output> {
         const wallet = await this.walletRepository.getWalletById(input.accountId);
@@ -17,17 +21,7 @@ export default class PlaceOrder {
         if (!hasBalance) throw new Error("Insufficient funds");
         await this.orderRepository.saveOrder(order);
         await this.walletRepository.updateWallet(wallet);
-        while (true) {
-            const highestBuy = await this.orderRepository.getHighestBuy(input.marketId);
-            const lowestSell = await this.orderRepository.getLowestSell(input.marketId);
-            if (!highestBuy || !lowestSell || highestBuy.getPrice() < lowestSell.getPrice()) break;
-            const fillQuantity = Math.min(highestBuy.getQuantity(), lowestSell.getQuantity());
-            const fillPrice = (highestBuy.getTimestamp() > lowestSell.getTimestamp()) ? lowestSell.getPrice() : highestBuy.getPrice();
-            highestBuy.fill(fillQuantity, fillPrice);
-            lowestSell.fill(fillQuantity, fillPrice);
-            await this.orderRepository.updateOrder(highestBuy);
-            await this.orderRepository.updateOrder(lowestSell);
-        }
+        await this.mediator.notifyAll("orderPlaced", order);
         return {
             orderId: order.getOrderId()
         }

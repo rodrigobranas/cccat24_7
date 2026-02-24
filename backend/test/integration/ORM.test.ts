@@ -1,9 +1,9 @@
-import Account from "../src/domain/Account";
-import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
-import Registry from "../src/infra/di/Registry";
-import { AccountModel } from "../src/infra/orm/AccountModel";
-import ORM from "../src/infra/orm/ORM";
-import { AccountRepositoryORM } from "../src/infra/repository/AccountRepository";
+import Account from "../../src/domain/Account";
+import { PgPromiseAdapter } from "../../src/infra/database/DatabaseConnection";
+import Registry from "../../src/infra/di/Registry";
+import { AccountModel } from "../../src/infra/orm/AccountModel";
+import ORM from "../../src/infra/orm/ORM";
+import { AccountRepositoryORM } from "../../src/infra/repository/AccountRepository";
 
 test("Deve testar o ORM", async () => {
     const connection = new PgPromiseAdapter();
