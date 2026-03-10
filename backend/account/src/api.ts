@@ -1,6 +1,7 @@
-import GetAccount from "./application/usecase/GetAccount";
+import GetAccount from "./application/query/GetAccount";
 import Signup from "./application/usecase/Signup";
 import AccountController from "./infra/controller/AccountController";
+import { AccountDAODatabase } from "./infra/dao/AccountDAO";
 import { PgPromiseAdapter } from "./infra/database/DatabaseConnection";
 import Registry from "./infra/di/Registry";
 import { ExpressAdapter } from "./infra/http/HttpServer";
@@ -13,6 +14,7 @@ async function main () {
     Registry.getInstance().register("mediator", new Mediator());
     Registry.getInstance().register("databaseConnection", new PgPromiseAdapter());
     Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("accountDAO", new AccountDAODatabase());
     Registry.getInstance().register("signup", new Signup());
     Registry.getInstance().register("getAccount", new GetAccount());
     new AccountController();

@@ -41,9 +41,10 @@ export default class Order {
         marketId: string,
         side: string,
         quantity: number,
-        price: number
+        price: number,
+        orderId?: string
     ) {
-        const orderId = UUID.create().getValue();
+        orderId = orderId || UUID.create().getValue();
         return new Order(
             orderId,
             marketId,

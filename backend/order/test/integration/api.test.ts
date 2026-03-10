@@ -1,4 +1,5 @@
 import axios from "axios";
+import UUID from "../../src/domain/UUID";
 
 axios.defaults.validateStatus = () => true;
 
@@ -30,37 +31,47 @@ test("Deve criar uma ordem de compra e uma ordem de venda em uma conta", async (
         assetId: "USD",
         quantity: 200000
     });
-    const outputPlaceOrder1 = (await axios.post("http://localhost:3001/place_order", {
+    const orderId1 = UUID.create().getValue();
+    const outputPlaceOrder1 = (await axios.post("http://localhost:3003/place_order", {
+        orderId: orderId1,
         accountId: outputSignup.accountId,
         marketId,
         side: "sell",
         quantity: 1,
         price: 78000
     })).data;
-    const outputPlaceOrder2 = (await axios.post("http://localhost:3001/place_order", {
+    await sleep(400);
+    const orderId2 = UUID.create().getValue();
+    const outputPlaceOrder2 = (await axios.post("http://localhost:3003/place_order", {
+        orderId: orderId2,
         accountId: outputSignup.accountId,
         marketId,
         side: "sell",
         quantity: 1,
         price: 79000
     })).data;
-    const outputPlaceOrder3 = (await axios.post("http://localhost:3001/place_order", {
+    await sleep(400);
+    const orderId3 = UUID.create().getValue();
+    const outputPlaceOrder3 = (await axios.post("http://localhost:3003/place_order", {
+        orderId: orderId3,
         accountId: outputSignup.accountId,
         marketId,
         side: "buy",
         quantity: 2,
         price: 80000
     })).data;
-    await sleep(10000);
-    const outputGetOrder1 = (await axios.get(`http://localhost:3001/orders/${outputPlaceOrder1.orderId}`)).data;
+    await sleep(2000);
+    const outputGetOrder1 = (await axios.get(`http://localhost:3001/orders/${orderId1}`)).data;
+    expect(outputGetOrder1.name).toBe("John Doe");
+    expect(outputGetOrder1.email).toBe("john.doe@gmail.com");
     expect(outputGetOrder1.fillQuantity).toBe(1);
     expect(outputGetOrder1.fillPrice).toBe(78000);
     expect(outputGetOrder1.status).toBe("closed");
-    const outputGetOrder2 = (await axios.get(`http://localhost:3001/orders/${outputPlaceOrder2.orderId}`)).data;
+    const outputGetOrder2 = (await axios.get(`http://localhost:3001/orders/${orderId2}`)).data;
     expect(outputGetOrder2.fillQuantity).toBe(1);
     expect(outputGetOrder2.fillPrice).toBe(79000);
     expect(outputGetOrder2.status).toBe("closed");
-    const outputGetOrder3 = (await axios.get(`http://localhost:3001/orders/${outputPlaceOrder3.orderId}`)).data;
+    const outputGetOrder3 = (await axios.get(`http://localhost:3001/orders/${orderId3}`)).data;
     expect(outputGetOrder3.fillQuantity).toBe(2);
     expect(outputGetOrder3.fillPrice).toBe(78500);
     expect(outputGetOrder3.status).toBe("closed");

@@ -6,6 +6,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "scripts": {
+    "dev": "npx nodemon src/api.ts"
+  },
   "dependencies": {
     "@types/amqplib": "^0.10.8",
     "@types/express": "^5.0.3",

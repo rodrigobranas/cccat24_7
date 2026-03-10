@@ -47,6 +47,11 @@ export default class OrderController {
             return output;
         });
 
+        this.queue.consume("placeOrder.placeOrder", async (input: any) => {
+            console.log("placeOrder.placeOrder");
+            await this.placeOrder.execute(input);
+        });
+
         this.httpServer.route("get", "/orders/:orderId", async (params: any, body: any) => {
             const output = await this.getOrder.execute(params.orderId);
             return output;

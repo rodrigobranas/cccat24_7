@@ -16,7 +16,7 @@ export default class PlaceOrder {
     async execute (input: Input): Promise<Output> {
         const wallet = await this.walletRepository.getWalletById(input.accountId);
         if (!wallet) throw new Error("Account not found");
-        const order = Order.createOrder(input.accountId, input.marketId, input.side, input.quantity, input.price);
+        const order = Order.createOrder(input.accountId, input.marketId, input.side, input.quantity, input.price, input.orderId);
         const hasBalance = wallet.blockOrder(order);
         if (!hasBalance) throw new Error("Insufficient funds");
         await this.orderRepository.saveOrder(order);
@@ -29,6 +29,7 @@ export default class PlaceOrder {
 }
 
 export type Input = {
+    orderId?: string,
     accountId: string,
     marketId: string,
     side: string,
