@@ -7,6 +7,7 @@ export default class GetAccount {
 
     async execute (accountId: string): Promise<Output> {
         const account = await this.accountDAO.getAccountById(accountId);
+        if (!account) throw new Error("Account not found");
         const output = {
             accountId: account.account_id,
             name: account.name,

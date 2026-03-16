@@ -20,7 +20,7 @@ beforeEach(() => {
     deposit = new Deposit();
 });
 
-test.only("Deve depositar em uma conta", async () => {
+test("Deve depositar em uma conta", async () => {
     const input = {
         name: "John Doe",
         email: "john.doe@gmail.com",

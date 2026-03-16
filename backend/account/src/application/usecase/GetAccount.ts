@@ -7,6 +7,7 @@ export default class GetAccount {
 
     async execute (accountId: string): Promise<Output> {
         const account = await this.accountRepository.getAccountById(accountId);
+        if (!account) throw new Error("Account not found");
         const output = {
             accountId: account.getAccountId(),
             name: account.getName(),
